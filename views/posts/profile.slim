@@ -1,0 +1,19 @@
+h1 #{@post[1]}
+h2 #{@post[3]}
+
+button Upvote
+button Downvote
+
+p Votes: #{@post[2]}
+p Posted at: #{@post[4]}
+p Posted by: #{@user[1]}
+
+h3 Comment below:
+form action='posts/:id' method="post"
+    textarea#content(rows="6" cols="50" name="comment")
+    button type='submit' Submit!
+
+h3 Comments:
+
+-for comment in @comments
+    p #{comment}

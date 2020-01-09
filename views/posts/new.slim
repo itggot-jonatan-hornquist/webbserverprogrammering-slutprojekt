@@ -1,0 +1,11 @@
+h1 Post as:
+p = session[:username]
+form action='/posts/new' method="post"
+            div
+                label for="title" Title: 
+                input#title type="text" name='title'
+            div
+                label for="content" Content: 
+                textarea#content(rows="5" cols="80" name="content")       
+            
+            button type='submit' Post!
