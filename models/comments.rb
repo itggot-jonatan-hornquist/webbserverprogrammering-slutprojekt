@@ -19,7 +19,8 @@ class Comments < Sinatra::Base
         @db.execute('SELECT Comments.votes, Comments.content, Comments.creation_date, Users.username
             FROM Comments
             INNER JOIN Users 
-            on Users.id = Comments.creation_user_id')
+            on Users.id = Comments.creation_user_id
+            WHERE post_id = ?;', post_id)
     end
 
     def self.get_comments_by_user_id(id)
@@ -30,8 +31,7 @@ class Comments < Sinatra::Base
 
     def self.create_comment(post_id, votes, content, creation_date, creation_user_id)
         @db.execute('INSERT INTO Comments (post_id, votes, content, creation_date, creation_user_id)
-                    VALUES (?,?,?,?,?)', 
-                    post_id, votes, content, creation_date, creation_user_id)
+                    VALUES (?,?,?,?,?)', post_id, votes, content, creation_date, creation_user_id)
     end
 
 end

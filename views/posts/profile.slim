@@ -1,15 +1,22 @@
 h1 #{@post[1]}
 h2 #{@post[3]}
 
-button Upvote
-button Downvote
+form action="/posts/#{@post[0]}/upvote" method='post'
+    button type='submit' Upvote
+
+form action='/posts/#{@post[0]}/downvote' method='post'
+    button type='submit' Downvote
 
 p Votes: #{@post[2]}
 p Posted at: #{@post[4]}
 p Posted by: #{@user[1]}
 
+p Tags:
+
+
+
 h3 Comment below:
-form action='posts/:id' method="post"
+form action="/posts/#{@post[0]}/" method="post"
     textarea#content(rows="6" cols="50" name="comment")
     button type='submit' Submit!
 

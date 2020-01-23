@@ -1,11 +1,15 @@
 h1 Welcome to Led-dit!
+
 button(onclick="window.location.href = '/users/login';") Login
 button(onclick="window.location.href = '/users/new';") Register
 button(onclick="window.location.href = '/posts/new';") Create post
 button(onclick="window.location.href = '/users/logout';") Logout
+
 h2 You're logged in as:
 h3 = session[:username]
 
 h2 Latest posts:
 -for post in @posts
-    p #{post}
+    p 
+     |#{post}
+     button(onclick="window.location.href = '/posts/#{post[0]}';") View
