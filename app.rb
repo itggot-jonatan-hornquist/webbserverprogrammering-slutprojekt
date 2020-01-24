@@ -11,11 +11,11 @@ class App < Sinatra::Base
 
     enable :sessions
 
-    before do 
+    before do
         
         @db = SQLite3::Database.new('db/db.db')
 
-        # Test for ez logins
+        # Test for ez logins 
         session[:id] = [10]
         session[:username] = "test"
 
@@ -89,7 +89,7 @@ class App < Sinatra::Base
         
         if right_password == password
             
-            p "logged in"
+            p "Logged in."
             
             id = User.get_user_id_by_username(username)
             session[:id] = id
@@ -99,7 +99,7 @@ class App < Sinatra::Base
 
         else
             
-            p "login failed"
+            p "Login failed."
 
         end
 
@@ -137,6 +137,9 @@ class App < Sinatra::Base
 
     get '/posts/new' do 
 
+        @db = SQLite3::Database.new('db/db.db')
+        @all_tags = Tags.get_all_tag_names
+
         if session[:id] == nil
             redirect '/users/login'
         end
@@ -160,9 +163,13 @@ class App < Sinatra::Base
 
         creation_user_id = session[:id]
 
+        # TODO: Fix this
+        tags = "something"
+
         
         Post.create_post(title, votes, content, creation_date, creation_user_id)
-        
+        Taggings.create_taggings(tags)
+
         redirect '/'
 
     end
@@ -192,7 +199,18 @@ class App < Sinatra::Base
         @post = Post.get_post_by_post_id(params[:id]).first
         @user = User.get_user_by_id(@post[5]).first
         @comments = Comments.get_comments_by_post_id_for_view(@post[0]).reverse
-        @tags = Taggings.get_tag_ids_by_post_id(params[:id])
+        @tags_ids = Taggings.get_tag_ids_by_post_id(params[:id])
+        
+        @tags = []
+        @tags_ids.each do |tag_id|
+
+            @tags << Tags.get_tag_name_by_tag_id(tag_id).first.first
+        
+        end
+        
+        # TODO: List tag_ids associated to post_id
+        #       Associate tag_ids with names
+
         
         slim :'posts/profile'
 
@@ -207,9 +225,6 @@ class App < Sinatra::Base
         content = params['comment']
         creation_date = Time.now.to_s
         creation_user_id = session[:id].first
-
-        # TODO: List tag_ids associated to post_id
-        #       Associate tag_ids with names
 
         Comments.create_comment(post_id, votes, content, creation_date, creation_user_id)
 

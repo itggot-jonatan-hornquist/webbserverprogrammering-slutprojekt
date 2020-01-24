@@ -10,8 +10,9 @@ form action='/posts/#{@post[0]}/downvote' method='post'
 p Votes: #{@post[2]}
 p Posted at: #{@post[4]}
 p Posted by: #{@user[1]}
-
 p Tags:
+-for tag in @tags
+    p #{tag}
 
 
 

@@ -7,11 +7,17 @@ class Taggings
 
     def self.get_tag_ids_by_post_id(id)
 
-        # Doesn't work
-
         @db.execute('SELECT tag_id
                     FROM Taggings
                     WHERE post_id = ?', id)
+
+    end
+
+    def self.create_taggings(tags)
+
+        # TODO: Finish this
+
+        
 
     end
 

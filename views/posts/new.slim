@@ -5,7 +5,25 @@ form action='/posts/new' method="post"
                 label for="title" Title: 
                 input#title type="text" name='title'
             div
+                label for="tags" Tag 1:
+                select# name="tags"
+                    option NIL
+                    -for tag in @all_tags
+                        option #{tag}
+                label for="tags" Tag 2:
+                select# name="tags"
+                    option NIL
+                    -for tag in @all_tags
+                        option #{tag}
+                label for="tags" Tag 3:
+                select# name="tags"
+                    option NIL
+                    -for tag in @all_tags
+                        option #{tag}
+
+                / TODO: Make less bad 🌞
+            div
                 label for="content" Content: 
                 textarea#content(rows="5" cols="80" name="content")       
-            
+
             button type='submit' Post!
