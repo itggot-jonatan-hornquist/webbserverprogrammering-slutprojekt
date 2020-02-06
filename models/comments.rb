@@ -1,7 +1,7 @@
-require 'Sinatra'
 require 'SQLite3'
+require_relative 'dbhandler.rb'
 
-class Comments < Sinatra::Base
+class Comments < DBHandler
 
     @db = SQLite3::Database.new('db/db.db')
 

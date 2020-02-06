@@ -1,7 +1,7 @@
-require 'Sinatra'
 require 'SQLite3'
+require_relative 'dbhandler.rb'
 
-class Post < Sinatra::Base
+class Post < DBHandler
 
     @db = SQLite3::Database.new('db/db.db')
 
@@ -69,6 +69,13 @@ class Post < Sinatra::Base
         @db.execute('UPDATE Posts
                     SET votes = ?
                     WHERE id = ?;', votes, post_id)
+
+    end
+
+    def self.get_max_post_id
+
+        @db.execute('SELECT MAX(id)
+                    FROM Posts;')
 
     end
 

@@ -24,7 +24,7 @@ class App < Sinatra::Base
 
     get '/users/?' do
 
-        @users = User.get_users
+        @users = User.get_all
         
         slim :'users/index'
         
@@ -41,27 +41,56 @@ class App < Sinatra::Base
     post '/users/new' do 
 
         @db = SQLite3::Database.new('db/db.db')
-        @users = User.get_users
+        @users = User.get_all
         password = params['password']
         
         id = @users.length
         username = params['username']
         password_hash = BCrypt::Password.create(password)
         admin = 0
-        creation_date = Time.now
+        creation_date = Time.now.to_s
 
         if username == nil || password == nil
             redirect '/users/new'
         end
 
 
-        right_password = BCrypt::Password.new password_hash        
+        right_password = BCrypt::Password.new password_hash
         
-        User.create_account(username, password_hash, admin, creation_date.to_s)
+        user_hash = {"id" => id, "username" => username,
+                    "password_hash" => password_hash, "admin" => admin,
+                    "creation_date" => creation_date}
+        
+        User.test_create_account(user_hash)
         
         redirect '/'
 
     end
+
+    # post '/users/new' do 
+
+    #     @db = SQLite3::Database.new('db/db.db')
+    #     @users = User.get_all
+    #     password = params['password']
+        
+    #     id = @users.length
+    #     username = params['username']
+    #     password_hash = BCrypt::Password.create(password)
+    #     admin = 0
+    #     creation_date = Time.now
+
+    #     if username == nil || password == nil
+    #         redirect '/users/new'
+    #     end
+
+
+    #     right_password = BCrypt::Password.new password_hash        
+        
+    #     User.create_account(username, password_hash, admin, creation_date.to_s)
+        
+    #     redirect '/'
+
+    # end
 
 
     get '/users/login' do
@@ -163,12 +192,38 @@ class App < Sinatra::Base
 
         creation_user_id = session[:id]
 
-        # TODO: Fix this
-        tags = "something"
+        max_post_id = Post.get_max_post_id.first.first
+        future_post_id = max_post_id + 1
 
+        tag_1 = params['tag_1'][2..-3]
+        tag_2 = params['tag_2'][2..-3]
+        tag_3 = params['tag_3'][2..-3]
+
+        # Check if .length is > 0 to find NIL
+        # CAN'T HAVE TAGS UNDER THE 4 CHARACTERS
+
+        tag_names = [tag_1, tag_2, tag_3]
+
+        tag_ids = []
+        tag_names.each do |tag_name|
+
+            if tag_name.length > 3
+
+                tag_id = Tags.get_tag_id_by_tag_name(tag_name).first.first
+
+                tag_ids << tag_id
+
+            end
+            
+        end
+        
+        tag_1 = tag_ids[0]
+        tag_2 = tag_ids[1]
+        tag_3 = tag_ids[2]
+            
         
         Post.create_post(title, votes, content, creation_date, creation_user_id)
-        Taggings.create_taggings(tags)
+        Taggings.create_taggings(future_post_id, tag_1, tag_2, tag_3)
 
         redirect '/'
 
@@ -208,9 +263,6 @@ class App < Sinatra::Base
         
         end
         
-        # TODO: List tag_ids associated to post_id
-        #       Associate tag_ids with names
-
         
         slim :'posts/profile'
 

@@ -6,17 +6,17 @@ form action='/posts/new' method="post"
                 input#title type="text" name='title'
             div
                 label for="tags" Tag 1:
-                select# name="tags"
+                select# name="tag_1"
                     option NIL
                     -for tag in @all_tags
                         option #{tag}
                 label for="tags" Tag 2:
-                select# name="tags"
+                select# name="tag_2"
                     option NIL
                     -for tag in @all_tags
                         option #{tag}
                 label for="tags" Tag 3:
-                select# name="tags"
+                select# name="tag_3"
                     option NIL
                     -for tag in @all_tags
                         option #{tag}

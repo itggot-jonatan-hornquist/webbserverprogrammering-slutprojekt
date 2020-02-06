@@ -1,13 +1,15 @@
-require 'Sinatra'
 require 'SQLite3'
+require_relative 'dbhandler.rb'
 
-class User < Sinatra::Base
+class User < DBHandler
     
-    @db = SQLite3::Database.new('db/db.db')
+    # @db = SQLite3::Database.new('db/db.db')
     
-    def self.get_users
-        @db.execute('SELECT * FROM Users')
-    end
+    set_table("Users")
+
+    # def self.get_users
+    #     @db.execute('SELECT * FROM Users')
+    # end
 
     def self.get_user_by_id(id)
         @db.execute('SELECT * 
@@ -21,8 +23,17 @@ class User < Sinatra::Base
                     WHERE username = ?;', username)
     end
 
-    def self.create_account(username, password_hash, admin, creation_date)
-        @db.execute('INSERT INTO Users (username, password_hash, admin, creation_date) VALUES (?,?,?,?)',username, password_hash, admin, creation_date)
+    # def self.create_account(username, password_hash, admin, creation_date)
+    #     DB.execute('INSERT INTO Users (username, password_hash, admin, creation_date) 
+    #                 VALUES (?,?,?,?)',
+    #                 username, password_hash, admin, creation_date)
+    # end
+
+    def self.test_create_account(user_hash)
+        
+        User.insert(user_hash)
+
+
     end
 
     def self.does_user_exist?(username)
