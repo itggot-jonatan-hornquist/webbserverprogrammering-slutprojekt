@@ -30,37 +30,44 @@ class DBHandler
         return ints
 
     end
+
+    def self.get(id)
+
+        return self.new(DB.execute("SELECT * 
+            FROM #{@table} 
+            WHERE id = ?;", id).first) 
+
+    end
+
     
-    def self.insert(hash)
+    def self.insert(entity)
 
-        # TODO: Insert created object into database
+        @insertable_vars_full = entity.instance_variables # Ta med namnen user.username osv
         
-        # INSERT INTO @table (#{array of insertable shit})
-        # VALUES (#{number of question marks based on amount of attributes})
-        # , #{array of insertable shit}
+        @insertable_vars = []
+        @insertable_values = []
+        @insertable_vars_full.each do |var|
+            @insertable_vars << var[1..-1]
+            @insertable_values << entity.instance_variable_get(var)
+        end
 
-        # instance_variable_get
+        @insertable_vars_str = @insertable_vars.join(", ")
 
-        # Converting the values of the hash to an array
-
-        @insertable_keys = hash.keys
-        @insertable_keys_str = hash.keys.join(", ")
-        @insertable_values = hash.values.join(", ")
-
-        byebug
-        
         @question_marks = ""
-        @insertable_keys.each do |key|
+        @insertable_vars.each do |key|
             @question_marks.concat("?,")
         end
         @question_marks = @question_marks[0..-2]
 
-        DB.execute("INSERT INTO #{@table} (#{@insertable_keys_str}) 
+        DB.execute("INSERT INTO #{@table} (#{@insertable_vars_str}) 
                     VALUES (#{@question_marks})", @insertable_values)
 
-                    # PROBLEM: @insert_values is a string
-                    # and it shouldn't be
+    end
 
+    def self.update(entity, column, value)
+        
+        DB.execute("UPDATE #{@table} SET #{column} = ?
+            WHERE id = ?;", value, entity.id) # votes, post_id
 
     end
         

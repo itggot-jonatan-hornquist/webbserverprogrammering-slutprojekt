@@ -44,7 +44,6 @@ class App < Sinatra::Base
         @users = User.get_all
         password = params['password']
         
-        id = @users.length
         username = params['username']
         password_hash = BCrypt::Password.create(password)
         admin = 0
@@ -57,40 +56,17 @@ class App < Sinatra::Base
 
         right_password = BCrypt::Password.new password_hash
         
-        user_hash = {"id" => id, "username" => username,
+        user_hash = {"username" => username,
                     "password_hash" => password_hash, "admin" => admin,
                     "creation_date" => creation_date}
         
-        User.test_create_account(user_hash)
+        user_object = User.new(user_hash)
+        
+        User.create_account(user_object)
         
         redirect '/'
 
     end
-
-    # post '/users/new' do 
-
-    #     @db = SQLite3::Database.new('db/db.db')
-    #     @users = User.get_all
-    #     password = params['password']
-        
-    #     id = @users.length
-    #     username = params['username']
-    #     password_hash = BCrypt::Password.create(password)
-    #     admin = 0
-    #     creation_date = Time.now
-
-    #     if username == nil || password == nil
-    #         redirect '/users/new'
-    #     end
-
-
-    #     right_password = BCrypt::Password.new password_hash        
-        
-    #     User.create_account(username, password_hash, admin, creation_date.to_s)
-        
-    #     redirect '/'
-
-    # end
 
 
     get '/users/login' do
@@ -158,7 +134,7 @@ class App < Sinatra::Base
 
     get '/' do
 
-        @posts = Post.get_posts.reverse
+        @posts = Post.get_posts_for_view
         
         slim :'posts/index'
 
@@ -178,9 +154,7 @@ class App < Sinatra::Base
     end
 
     post '/posts/new' do
-        
-        @db = SQLite3::Database.new('db/db.db')
-        
+                
         title = params['title']
         votes = 0
         content = params['content']
@@ -192,7 +166,7 @@ class App < Sinatra::Base
 
         creation_user_id = session[:id]
 
-        max_post_id = Post.get_max_post_id.first.first
+        max_post_id = Post.get_max_post_id.first.first[1]
         future_post_id = max_post_id + 1
 
         tag_1 = params['tag_1'][2..-3]
@@ -220,32 +194,44 @@ class App < Sinatra::Base
         tag_1 = tag_ids[0]
         tag_2 = tag_ids[1]
         tag_3 = tag_ids[2]
-            
+
+        post_hash = {"title" => title, "votes" => votes,
+                    "content" => content, "creation_date" => creation_date,
+                    "creation_user_id" => creation_user_id}
+        byebug
+
+        post = Post.new(post_hash)
+            # DET FINNS SÄKERT NÅGOT FEL I DEN HÄR OCKSÅ
         
-        Post.create_post(title, votes, content, creation_date, creation_user_id)
+        Post.create_post(post)
         Taggings.create_taggings(future_post_id, tag_1, tag_2, tag_3)
 
         redirect '/'
 
     end
 
+
     post '/posts/:id/upvote' do
 
-        post_id = params[:id].to_i
+        @post_id = params[:id].to_i
+        
+        post = Post.get(@post_id)
 
-        Post.upvote(post_id)
+        Post.vote(post, 1)
 
-        redirect "/posts/#{post_id}"
+        redirect "/posts/#{@post_id}"
 
     end
     
     post '/posts/:id/downvote' do
 
-        post_id = params[:id].to_i
+        @post_id = params[:id].to_i
 
-        Post.downvote(post_id)
+        post = Post.get(@post_id)
 
-        redirect "/posts/#{post_id}"
+        Post.vote(post, -1)
+
+        redirect "/posts/#{@post_id}"
 
     end
 

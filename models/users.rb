@@ -2,17 +2,11 @@ require 'SQLite3'
 require_relative 'dbhandler.rb'
 
 class User < DBHandler
-    
-    # @db = SQLite3::Database.new('db/db.db')
-    
+        
     set_table("Users")
 
-    # def self.get_users
-    #     @db.execute('SELECT * FROM Users')
-    # end
-
     def self.get_user_by_id(id)
-        @db.execute('SELECT * 
+        DB.execute('SELECT * 
                     FROM Users 
                     WHERE id = ?;', id)
     end
@@ -23,16 +17,9 @@ class User < DBHandler
                     WHERE username = ?;', username)
     end
 
-    # def self.create_account(username, password_hash, admin, creation_date)
-    #     DB.execute('INSERT INTO Users (username, password_hash, admin, creation_date) 
-    #                 VALUES (?,?,?,?)',
-    #                 username, password_hash, admin, creation_date)
-    # end
-
-    def self.test_create_account(user_hash)
+    def self.create_account(user_object)
         
-        User.insert(user_hash)
-
+        User.insert(user_object)
 
     end
 

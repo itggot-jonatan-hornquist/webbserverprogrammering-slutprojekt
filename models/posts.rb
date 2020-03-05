@@ -3,17 +3,11 @@ require_relative 'dbhandler.rb'
 
 class Post < DBHandler
 
-    @db = SQLite3::Database.new('db/db.db')
-
-    def self.get_posts
-
-        @db.execute('SELECT * FROM Posts')
-        
-    end
+    set_table("Posts")
 
     def self.get_post_by_post_id(id)
 
-        @db.execute('SELECT * 
+        DB.execute('SELECT * 
                     FROM Posts 
                     WHERE id = ?;', id)
 
@@ -21,7 +15,7 @@ class Post < DBHandler
 
     def self.get_posts_by_user_id(id)
 
-        @db.execute('SELECT * 
+        DB.execute('SELECT * 
                     FROM Posts
                     WHERE creation_user_id = ?;', id)
 
@@ -29,52 +23,41 @@ class Post < DBHandler
 
     def self.get_posts_for_view
 
-        @db.execute('SELECT Posts.title, Posts.votes, Posts.content, Posts.creation_date, Users.username
+        posts = DB.execute('SELECT Posts.title, Posts.votes, Posts.content, Posts.creation_date, Users.username
             FROM Posts
             INNER JOIN Users 
-            on Users.id = Posts.creation_user_id')
+            on Users.id = Posts.creation_user_id').reverse
 
+        viewable_posts = []
+        posts.each do |post|
+            viewable_posts << Post.new(post)
+        end
+
+        return viewable_posts
     end
 
-    def self.create_post(title, votes, content, creation_date, creation_user_id)
+    def self.create_post(post)
 
-        @db.execute('INSERT INTO Posts (title, votes, content, creation_date, creation_user_id) 
-                    VALUES (?,?,?,?,?)',
-                    title, votes, content, creation_date, creation_user_id)
+        #FIXA DEN HÄR SKITEN
+        Post.insert(post)
         
         puts "Post created:\n      Title: #{title} \n      Votes: #{votes}\n      Content: #{content}\n      Creation time: #{creation_date}\n      Creation User Id:#{creation_user_id.first}"
 
     end
 
-    def self.upvote(post_id)
+    def self.vote(post, value)
 
-        votes = @db.execute('SELECT Posts.votes
-                            FROM Posts
-                            WHERE id = ?;', post_id).first.first
-        votes += 1
+        votes = post.votes += value
+        column = "votes"
 
-        @db.execute('UPDATE Posts
-                    SET votes = ?
-                    WHERE id = ?;', votes, post_id)
+        Post.update(post, column, votes)
 
     end
 
-    def self.downvote(post_id)
-
-        votes = @db.execute('SELECT Posts.votes
-                            FROM Posts
-                            WHERE id = ?;', post_id).first.first
-        votes -= 1
-
-        @db.execute('UPDATE Posts
-                    SET votes = ?
-                    WHERE id = ?;', votes, post_id)
-
-    end
 
     def self.get_max_post_id
 
-        @db.execute('SELECT MAX(id)
+        DB.execute('SELECT MAX(id)
                     FROM Posts;')
 
     end
