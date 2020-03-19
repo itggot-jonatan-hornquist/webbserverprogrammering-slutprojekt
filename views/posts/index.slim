@@ -12,4 +12,4 @@ h2 Latest posts:
 -for post in @posts
     p 
      |#{post.title} #{post.content} #{post.votes} #{post.creation_date} #{post.username}
-     button(onclick="window.location.href = '/posts/#{post}';") View
+     button(onclick="window.location.href = '/posts/#{post.id}';") View

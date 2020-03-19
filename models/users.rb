@@ -19,7 +19,7 @@ class User < DBHandler
 
     def self.create_account(user_object)
         
-        User.insert(user_object)
+        user_object.insert
 
     end
 

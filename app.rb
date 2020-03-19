@@ -7,6 +7,9 @@ require_relative 'models/posts.rb'
 require_relative 'models/taggings.rb'
 require_relative 'models/tags.rb'
 
+#TODO: FIXA CASCADING (ATT SAKER ASSOCIERADE TILL ANDRA SAKER I DATABASEN
+# FÖRSVINNER)
+
 class App < Sinatra::Base
 
     enable :sessions
@@ -198,13 +201,15 @@ class App < Sinatra::Base
         post_hash = {"title" => title, "votes" => votes,
                     "content" => content, "creation_date" => creation_date,
                     "creation_user_id" => creation_user_id}
-        byebug
 
         post = Post.new(post_hash)
-            # DET FINNS SÄKERT NÅGOT FEL I DEN HÄR OCKSÅ
         
         Post.create_post(post)
-        Taggings.create_taggings(future_post_id, tag_1, tag_2, tag_3)
+
+        taggings_hash = {"post_id" => future_post_id, "tag_1" => tag_1, "tag_2" => tag_2, "tag_3" => tag_3}
+
+        taggings = Taggings.new(taggings_hash)
+        Taggings.create_taggings(taggings)
 
         redirect '/'
 
@@ -237,7 +242,7 @@ class App < Sinatra::Base
 
     get '/posts/:id' do
 
-        @post = Post.get_post_by_post_id(params[:id]).first
+        @post = Post.new(Post.get_post_by_post_id(params[:id]).first)
         @user = User.get_user_by_id(@post[5]).first
         @comments = Comments.get_comments_by_post_id_for_view(@post[0]).reverse
         @tags_ids = Taggings.get_tag_ids_by_post_id(params[:id])

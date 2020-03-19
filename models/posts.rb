@@ -38,11 +38,8 @@ class Post < DBHandler
 
     def self.create_post(post)
 
-        #FIXA DEN HÄR SKITEN
         Post.insert(post)
         
-        puts "Post created:\n      Title: #{title} \n      Votes: #{votes}\n      Content: #{content}\n      Creation time: #{creation_date}\n      Creation User Id:#{creation_user_id.first}"
-
     end
 
     def self.vote(post, value)

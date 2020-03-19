@@ -40,7 +40,9 @@ class DBHandler
     end
 
     
-    def self.insert(entity)
+    def insert()
+
+        # Kräver att det finns ett "set_table("Table")" i klassen
 
         @insertable_vars_full = entity.instance_variables # Ta med namnen user.username osv
         
@@ -68,6 +70,13 @@ class DBHandler
         
         DB.execute("UPDATE #{@table} SET #{column} = ?
             WHERE id = ?;", value, entity.id) # votes, post_id
+
+    end
+
+    def self.delete(entity)
+
+        DB.execute("DELETE FROM #{@table}
+                    WHERE id = ?;", entity.id)
 
     end
         
