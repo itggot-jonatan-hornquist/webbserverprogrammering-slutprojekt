@@ -7,7 +7,7 @@ require_relative 'models/posts.rb'
 require_relative 'models/taggings.rb'
 require_relative 'models/tags.rb'
 
-#TODO: FIXA CASCADING (ATT SAKER ASSOCIERADE TILL ANDRA SAKER I DATABASEN
+# TODO: FIXA CASCADING (ATT SAKER ASSOCIERADE TILL ANDRA SAKER I DATABASEN
 # FÖRSVINNER)
 
 class App < Sinatra::Base
@@ -136,6 +136,15 @@ class App < Sinatra::Base
 
 
     get '/' do
+
+        if session[:username] != nil
+            user_hash = User.get_user_by_username(session[:username]).first
+            @user = User.new(user_hash)
+        end
+
+        byebug
+        @user.delete
+
 
         @posts = Post.get_posts_for_view
         

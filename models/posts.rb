@@ -23,7 +23,7 @@ class Post < DBHandler
 
     def self.get_posts_for_view
 
-        posts = DB.execute('SELECT Posts.title, Posts.votes, Posts.content, Posts.creation_date, Users.username
+        posts = DB.execute('SELECT Posts.id, Posts.title, Posts.votes, Posts.content, Posts.creation_date, Users.username
             FROM Posts
             INNER JOIN Users 
             on Users.id = Posts.creation_user_id').reverse

@@ -12,7 +12,7 @@ class User < DBHandler
     end
 
     def self.get_user_by_username(username)
-        @db.execute('SELECT * 
+        DB.execute('SELECT * 
                     FROM Users 
                     WHERE username = ?;', username)
     end
@@ -24,7 +24,7 @@ class User < DBHandler
     end
 
     def self.does_user_exist?(username)
-        user = @db.execute('SELECT id FROM Users WHERE username = ?;', username).first
+        user = DB.execute('SELECT id FROM Users WHERE username = ?;', username).first
 
         if user != nil
             return true
@@ -35,11 +35,20 @@ class User < DBHandler
     end
 
     def self.get_password_hash_by_username(username)
-        @db.execute('SELECT password_hash FROM Users WHERE username = ?;', username).first.first
+        DB.execute('SELECT password_hash FROM Users WHERE username = ?;', username).first.first
     end
 
     def self.get_user_id_by_username(username)
-        @db.execute('SELECT id from Users WHERE username = ?;', username).first
+        DB.execute('SELECT id from Users WHERE username = ?;', username).first
+    end
+
+
+    # Fixa så den tar bort allting i databasen som har samma user.id som
+    # user-objektet
+    def delete
+
+        tables = 
+
     end
 
 end

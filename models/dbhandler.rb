@@ -73,6 +73,7 @@ class DBHandler
 
     end
 
+    # Deletes objects
     def self.delete(entity)
 
         DB.execute("DELETE FROM #{@table}
