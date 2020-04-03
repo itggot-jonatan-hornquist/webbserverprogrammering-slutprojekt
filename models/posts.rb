@@ -7,15 +7,15 @@ class Post < DBHandler
 
     def self.get_post_by_post_id(id)
 
-        DB.execute('SELECT * 
-                    FROM Posts 
+        DB.execute('SELECT *
+                    FROM Posts
                     WHERE id = ?;', id)
 
     end
 
     def self.get_posts_by_user_id(id)
 
-        DB.execute('SELECT * 
+        DB.execute('SELECT *
                     FROM Posts
                     WHERE creation_user_id = ?;', id)
 
@@ -25,7 +25,7 @@ class Post < DBHandler
 
         posts = DB.execute('SELECT Posts.id, Posts.title, Posts.votes, Posts.content, Posts.creation_date, Users.username
             FROM Posts
-            INNER JOIN Users 
+            INNER JOIN Users
             on Users.id = Posts.creation_user_id').reverse
 
         viewable_posts = []
@@ -39,7 +39,7 @@ class Post < DBHandler
     def self.create_post(post)
 
         Post.insert(post)
-        
+
     end
 
     def self.vote(post, value)
