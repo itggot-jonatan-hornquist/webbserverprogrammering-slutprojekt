@@ -1,14 +1,26 @@
 require 'Sinatra'
 require 'SQLite3'
+require 'net'
+require 'http'
+require 'net/http'
 
 require_relative 'models/users.rb'
 require_relative 'models/comments.rb'
 require_relative 'models/posts.rb'
 require_relative 'models/taggings.rb'
 require_relative 'models/tags.rb'
+require_relative 'models/logins.rb'
 
-# TODO: FIXA CASCADING (ATT SAKER ASSOCIERADE TILL ANDRA SAKER I DATABASEN
-# FÖRSVINNER)
+#TODO: Inloggningscheck i before
+#         if request.get? && request.path != "/login" && session[:user_id].nil?
+            # redirect '/login'
+        # else
+#TODO: Cooldown för inloggning
+# Tabell med inloggningar (id, timestamp, ip)
+
+#TODO: Kommentera funktioner/klasser
+
+#TODO: Automatiska tester
 
 class App < Sinatra::Base
 
@@ -19,8 +31,8 @@ class App < Sinatra::Base
         @db = SQLite3::Database.new('db/db.db')
 
         # Test for ez logins
-        session[:id] = [4]
-        session[:username] = "svenbertil"
+        # session[:id] = [5]
+        # session[:username] = "david"
 
 	end
 
@@ -82,7 +94,7 @@ class App < Sinatra::Base
 
         @db = SQLite3::Database.new('db/db.db')
 
-		username = params['username']
+        username = params['username']
         password = params['password']
 
         if !User.does_user_exist?(username) || username == nil
@@ -91,27 +103,69 @@ class App < Sinatra::Base
 
         end
 
-        password_hash = User.get_password_hash_by_username(username)
+        password_hash = User.get_password_hash_by_username(username)[1]
 
-		right_password = BCrypt::Password.new(password_hash)
+	      right_password = BCrypt::Password.new(password_hash)
 
-        if right_password == password
+        user_id = User.get_user_by_username(username)[0]["id"]
+        attempt_hashes = Logins.get_attempts(user_id)
+        attempts = []
+        attempt_hashes.each do |attempt|
+          attempts << Logins.new(attempt)
+        end
 
-            p "Logged in."
+        cooldown_minutes = 5
 
-            id = User.get_user_id_by_username(username)
-            session[:id] = id
-            session[:username] = username
+        recent_attempts = []
+        attempts.each do |attempt|
+          if (Time.now - Time.parse(attempt.time)) < cooldown_minutes*60
+            recent_attempts << attempt
+          end
+        end
 
-            redirect '/'
+        max_recent_attempts = 3
 
-        else
+        if recent_attempts.length <= max_recent_attempts
 
-            p "Login failed."
+
+          if right_password == password
+
+              p "Logged in."
+
+              id = User.get_user_id_by_username(username)
+              session[:id] = id
+              session[:username] = username
+
+              status = "success"
+
+
+          else
+
+              p "Login failed."
+
+              status = "fail"
+
+          end
 
         end
 
+        # Security shit
+        login_request = {"user_id" => nil,
+                          "ip" => nil,
+                          "time" => nil,
+                          "status" => nil}
+
+
+          login_request["user_id"] = User.get_user_id_by_username(username)["id"]
+          login_request["ip"] = Net::HTTP.get('ipecho.net', '/plain')
+          login_request["time"] = Time.now.to_s
+          login_request["status"] = status
+
+          login_request_object = Logins.new(login_request)
+          Logins.push_attempt(login_request_object)
+
         status 200
+        redirect '/'
 
     end
 
@@ -129,7 +183,6 @@ class App < Sinatra::Base
       @user = User.new(User.get_user_by_id(session[:id]).first)
       session[:id] = nil
       session[:username] = nil
-      byebug
       @user.delete
 
       redirect '/'
@@ -150,7 +203,6 @@ class App < Sinatra::Base
 
     get '/' do
 
-        byebug
         if session[:username] != nil
             user_hash = User.get_user_by_username(session[:username]).first
             @user = User.new(user_hash)

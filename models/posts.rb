@@ -38,7 +38,7 @@ class Post < DBHandler
 
     def self.create_post(post)
 
-        Post.insert(post)
+        post.insert
 
     end
 
