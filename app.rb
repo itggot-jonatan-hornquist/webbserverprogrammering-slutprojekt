@@ -132,7 +132,7 @@ class App < Sinatra::Base
 
               p "Logged in."
 
-              id = User.get_user_id_by_username(username)
+              id = User.get_user_id_by_username(username)["id"]
               session[:id] = id
               session[:username] = username
 
@@ -278,7 +278,6 @@ class App < Sinatra::Base
         Post.create_post(post)
 
         taggings_hash = {"post_id" => future_post_id, "tag_1" => tag_1, "tag_2" => tag_2, "tag_3" => tag_3}
-
         taggings = Taggings.new(taggings_hash)
         Taggings.create_taggings(taggings)
 
@@ -314,8 +313,8 @@ class App < Sinatra::Base
     get '/posts/:id' do
 
         @post = Post.new(Post.get_post_by_post_id(params[:id]).first)
-        @user = User.get_user_by_id(@post[5]).first
-        @comments = Comments.get_comments_by_post_id_for_view(@post[0]).reverse
+        @user = User.get_user_by_id(@post.creation_user_id).first
+        @comments = Comments.get_comments_by_post_id_for_view(@post.id).reverse
         @tags_ids = Taggings.get_tag_ids_by_post_id(params[:id])
 
         @tags = []
@@ -338,7 +337,7 @@ class App < Sinatra::Base
         votes = 0
         content = params['comment']
         creation_date = Time.now.to_s
-        creation_user_id = session[:id].first
+        creation_user_id = session[:id]
 
         Comments.create_comment(post_id, votes, content, creation_date, creation_user_id)
 

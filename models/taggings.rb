@@ -20,12 +20,12 @@ class Taggings < DBHandler
         tags = [taggings.tag_1, taggings.tag_2, taggings.tag_3]
 
         viable_tag = {"post_id" => taggings.post_id, "tag_id" => nil}
-        
+
         tags.each do |tag|
             if tag != nil
                 viable_tag["tag_id"] = tag
                 insertable_tag = Taggings.new(viable_tag)
-                Taggings.insert(insertable_tag)
+                insertable_tag.insert
             end
         end
 
