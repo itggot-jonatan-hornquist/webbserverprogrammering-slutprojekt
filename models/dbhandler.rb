@@ -1,5 +1,6 @@
 require 'SQLite3'
 
+# Handles all interactions with the database
 class DBHandler
 
   def self.set_table(table)
@@ -18,6 +19,15 @@ class DBHandler
 
     DB.results_as_hash = true
 
+    # Takes a hash and turns it into an object of any given class
+    #
+    # hash - a hash to be turned into an object
+    #
+    # Examples:
+    # {"name" => "bert", "age" => 33}
+    # #=> #<User:0006x1 @name="bert", @age=33>
+    #
+    # Returns object
     def initialize(hash)
 
         @table = self.class.table
@@ -31,6 +41,15 @@ class DBHandler
 
     end
 
+    # Takes a table and returns everything on it as objects of that table
+    #
+    # self - table to be returned
+    #
+    # Examples:
+    # users.get_all
+    # #=> [#<User:0006x1 @name="bert", @age=33>]
+    #
+    # Returns a list of object
     def self.get_all
         unints = DB.execute("SELECT * FROM #{@table}")
 
@@ -52,7 +71,16 @@ class DBHandler
 
     end
 
-
+    # Inserts an object into its appropriate table by an sql request
+    #
+    # instance_variables - any object
+    #
+    # Examples:
+    # @user.insert
+    # #=> INSERT INTO Users (list of strings)
+    #      VALUES (question mark for each stirng)", values for each string)
+    #
+    # Returns an SQl request
     def insert()
 
         # Kräver att det finns ett "set_table("Table")" i klassen
@@ -79,6 +107,18 @@ class DBHandler
 
     end
 
+    # Creates an sql request which updates a given entity
+    #
+    # entity - objects
+    # column - variable of object
+    # value - value of variable
+    #
+    # Examples:
+    # User.update(@user, "name", "kent")
+    # #=> Update Users SET name = ?
+    #      WHERE id = ?;, "kent", @user.id
+    #
+    # Returns an SQl request
     def self.update(entity, column, value)
 
         DB.execute("UPDATE #{@table} SET #{column} = ?
@@ -86,7 +126,15 @@ class DBHandler
 
     end
 
-    # Deletes objects
+    # Creates an SQL request to delete an object
+    #
+    # entity - any object
+    #
+    # Examples:
+    # @user.delete
+    # #=> DELETE FROM Users WHERE id = ?, eneity.id
+    #
+    # Returns an SQl request
     def self.delete(entity)
 
         DB.execute("DELETE FROM #{@table}

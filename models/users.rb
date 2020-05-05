@@ -43,6 +43,14 @@ class User < DBHandler
 
 
     # Takes a user object, deletes the user and all the comments and posts associaated with them
+    #
+    # input - any user
+    #
+    # Examples:
+    # @user.delete
+    # #=> DELETE FROM #{table} WHERE creation_user_id = #{user_id}
+    #
+    # Returns two SQl request
     def delete
 
         user_id = self.id

@@ -15,6 +15,15 @@ class Taggings < DBHandler
 
     end
 
+    # Creates an SQL request for each tag submitted for post
+    #
+    # taggings - list of tag-objects
+    #
+    # Examples:
+    # @Post.create_taggings(list of tags)
+    # #=> creates an insert sql request for each tag
+    #
+    # Returns multiple SQl requests
     def self.create_taggings(taggings)
 
         tags = [taggings.tag_1, taggings.tag_2, taggings.tag_3]

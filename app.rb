@@ -26,6 +26,7 @@ class App < Sinatra::Base
 
     enable :sessions
 
+    # Connects to DB
     before do
 
         @db = SQLite3::Database.new('db/db.db')
@@ -36,7 +37,7 @@ class App < Sinatra::Base
 
 	end
 
-
+    # Gets and publishes a list of all users
     get '/users/?' do
 
         @users = User.get_all
@@ -45,6 +46,7 @@ class App < Sinatra::Base
 
     end
 
+    # Loads the slim for users/new
     get '/users/new' do
 
         user = {"username"=>nil, "password"=>nil}
@@ -53,6 +55,7 @@ class App < Sinatra::Base
 
     end
 
+    # Handles the creation of a new user
     post '/users/new' do
 
         @db = SQLite3::Database.new('db/db.db')
@@ -90,6 +93,7 @@ class App < Sinatra::Base
 
     end
 
+    # Handles the authentication and slim for a user logging in
     post '/users/login' do
 
         @db = SQLite3::Database.new('db/db.db')
@@ -169,6 +173,7 @@ class App < Sinatra::Base
 
     end
 
+    # Logs the user out
     get '/users/logout' do
 
         session[:id] = nil
@@ -178,6 +183,7 @@ class App < Sinatra::Base
 
     end
 
+    # Deletes the loggen in user
     get '/users/delete' do
 
       @user = User.new(User.get_user_by_id(session[:id]).first)
@@ -189,6 +195,7 @@ class App < Sinatra::Base
 
     end
 
+    # Gets the user profile
     get '/users/:username' do
 
         @user = User.get_user_by_username(params[:username]).first
@@ -201,6 +208,7 @@ class App < Sinatra::Base
 
 
 
+    # Gets index
     get '/' do
 
         if session[:username] != nil
@@ -227,6 +235,7 @@ class App < Sinatra::Base
 
     end
 
+    # Handles the creation of a new post
     post '/posts/new' do
 
         title = params['title']
@@ -285,7 +294,7 @@ class App < Sinatra::Base
 
     end
 
-
+    # Allows for upvoting
     post '/posts/:id/upvote' do
 
         @post_id = params[:id].to_i
@@ -298,6 +307,7 @@ class App < Sinatra::Base
 
     end
 
+    # Allows for downvoting
     post '/posts/:id/downvote' do
 
         @post_id = params[:id].to_i
@@ -310,6 +320,8 @@ class App < Sinatra::Base
 
     end
 
+
+    # Gets and displays a given post
     get '/posts/:id' do
 
         @post = Post.new(Post.get_post_by_post_id(params[:id]).first)
@@ -329,6 +341,7 @@ class App < Sinatra::Base
 
     end
 
+    # Front for comment creation
     post '/posts/:id/' do
 
         @post = Post.get_post_by_post_id(params[:id]).first
